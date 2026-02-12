@@ -1,0 +1,11 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce.controller,ProductController,0,33,0,0,0,7,0,3,0,3
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce.controller,NewsletterController,0,25,0,0,0,8,0,2,0,2
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce.service,ProductService,26,206,4,5,3,41,4,7,0,5
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce.service,NewsletterService,0,45,0,2,0,13,0,3,0,2
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce.entity,NewsletterSubscription,11,0,2,0,4,0,2,0,1,0
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce.entity,Product,11,0,0,0,5,0,2,0,2,0
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce.config,WebConfig,0,47,0,0,0,7,0,2,0,2
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce.exception,DuplicateSubscriptionException,0,4,0,0,0,2,0,1,0,1
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce.exception,GlobalExceptionHandler,16,61,0,0,6,20,1,5,1,5
+Crest & Thread E-commerce Backend,com.crestandthread.ecommerce,EcommerceApplication,5,3,0,0,2,1,1,1,1,1

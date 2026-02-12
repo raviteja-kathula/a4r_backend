@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.crestandthread.ecommerce.controller.NewsletterControllerTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.356 s -- in com.crestandthread.ecommerce.controller.NewsletterControllerTest

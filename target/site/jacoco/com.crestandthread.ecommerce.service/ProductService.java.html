@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Crest &amp; Thread E-commerce Backend</a> &gt; <a href="index.source.html" class="el_package">com.crestandthread.ecommerce.service</a> &gt; <span class="el_source">ProductService.java</span></div><h1>ProductService.java</h1><pre class="source lang-java linenums">// AI Generated Code by Deloitte + Cursor (BEGIN)
+package com.crestandthread.ecommerce.service;
+
+import com.crestandthread.ecommerce.dto.ProductDTO;
+import com.crestandthread.ecommerce.dto.ProductListResponse;
+import com.crestandthread.ecommerce.entity.Product;
+import com.crestandthread.ecommerce.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+<span class="fc" id="L23">@Slf4j</span>
+@Transactional(readOnly = true)
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    public List&lt;ProductDTO&gt; getFeaturedProducts() {
+<span class="fc" id="L30">        log.debug(&quot;Fetching featured products&quot;);</span>
+<span class="fc" id="L31">        List&lt;Product&gt; products = productRepository.findByIsFeaturedTrue();</span>
+<span class="fc" id="L32">        return products.stream()</span>
+<span class="fc" id="L33">                .map(this::convertToDTO)</span>
+<span class="fc" id="L34">                .collect(Collectors.toList());</span>
+    }
+
+    public ProductListResponse getProducts(String category, String type, String color, 
+                                          String size, BigDecimal priceMin, BigDecimal priceMax,
+                                          String sort, int page, int limit) {
+<span class="fc" id="L40">        log.debug(&quot;Fetching products with filters - category: {}, type: {}, color: {}, size: {}, priceRange: {}-{}, sort: {}, page: {}, limit: {}&quot;,</span>
+<span class="fc" id="L41">                category, type, color, size, priceMin, priceMax, sort, page, limit);</span>
+
+<span class="fc" id="L43">        Sort sortOrder = getSortOrder(sort);</span>
+<span class="fc" id="L44">        Pageable pageable = PageRequest.of(page - 1, limit, sortOrder);</span>
+
+<span class="fc" id="L46">        Page&lt;Product&gt; productPage = productRepository.findByFilters(</span>
+                category, type, color, size, priceMin, priceMax, pageable
+        );
+
+<span class="fc" id="L50">        List&lt;ProductDTO&gt; productDTOs = productPage.getContent().stream()</span>
+<span class="fc" id="L51">                .map(this::convertToDTO)</span>
+<span class="fc" id="L52">                .collect(Collectors.toList());</span>
+
+<span class="fc" id="L54">        return ProductListResponse.builder()</span>
+<span class="fc" id="L55">                .data(productDTOs)</span>
+<span class="fc" id="L56">                .total((int) productPage.getTotalElements())</span>
+<span class="fc" id="L57">                .page(page)</span>
+<span class="fc" id="L58">                .totalPages(productPage.getTotalPages())</span>
+<span class="fc" id="L59">                .build();</span>
+    }
+
+    private Sort getSortOrder(String sort) {
+<span class="pc bpc" id="L63" title="1 of 4 branches missed.">        if (sort == null || sort.equalsIgnoreCase(&quot;featured&quot;)) {</span>
+<span class="fc" id="L64">            return Sort.by(Sort.Direction.DESC, &quot;isFeatured&quot;).and(Sort.by(Sort.Direction.DESC, &quot;createdAt&quot;));</span>
+        }
+<span class="pc bpc" id="L66" title="3 of 5 branches missed.">        return switch (sort.toLowerCase()) {</span>
+<span class="fc" id="L67">            case &quot;price_asc&quot; -&gt; Sort.by(Sort.Direction.ASC, &quot;price&quot;);</span>
+<span class="fc" id="L68">            case &quot;price_desc&quot; -&gt; Sort.by(Sort.Direction.DESC, &quot;price&quot;);</span>
+<span class="nc" id="L69">            case &quot;newest&quot; -&gt; Sort.by(Sort.Direction.DESC, &quot;createdAt&quot;);</span>
+<span class="nc" id="L70">            case &quot;rating&quot; -&gt; Sort.by(Sort.Direction.DESC, &quot;rating&quot;);</span>
+<span class="nc" id="L71">            default -&gt; Sort.by(Sort.Direction.DESC, &quot;createdAt&quot;);</span>
+        };
+    }
+
+    private ProductDTO convertToDTO(Product product) {
+<span class="fc" id="L76">        return ProductDTO.builder()</span>
+<span class="fc" id="L77">                .id(product.getId())</span>
+<span class="fc" id="L78">                .title(product.getTitle())</span>
+<span class="fc" id="L79">                .category(product.getCategory())</span>
+<span class="fc" id="L80">                .type(product.getType())</span>
+<span class="fc" id="L81">                .description(product.getDescription())</span>
+<span class="fc" id="L82">                .price(product.getPrice())</span>
+<span class="fc" id="L83">                .image(product.getImage())</span>
+<span class="fc" id="L84">                .badge(product.getBadge())</span>
+<span class="fc" id="L85">                .rating(product.getRating())</span>
+<span class="fc" id="L86">                .ratingCount(product.getRatingCount())</span>
+<span class="fc" id="L87">                .colors(product.getColors())</span>
+<span class="fc" id="L88">                .sizes(product.getSizes())</span>
+<span class="fc" id="L89">                .stockQuantity(product.getStockQuantity())</span>
+<span class="fc" id="L90">                .isFeatured(product.getIsFeatured())</span>
+<span class="fc" id="L91">                .build();</span>
+    }
+}
+// AI Generated Code by Deloitte + Cursor (END)
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,16 @@
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/dto/ProductDTO.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/entity/Product.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/entity/NewsletterSubscription.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/config/WebConfig.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/exception/DuplicateSubscriptionException.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/service/NewsletterService.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/service/ProductService.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/controller/NewsletterController.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/controller/ProductController.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/repository/NewsletterSubscriptionRepository.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/repository/ProductRepository.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/EcommerceApplication.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/exception/GlobalExceptionHandler.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/dto/ProductListResponse.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/dto/NewsletterSubscriptionRequest.java
+/Users/katraviteja/Desktop/sdlc-assist2/backend/src/main/java/com/crestandthread/ecommerce/dto/ApiResponse.java

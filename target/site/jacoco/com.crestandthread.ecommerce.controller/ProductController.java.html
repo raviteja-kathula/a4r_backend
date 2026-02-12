@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Crest &amp; Thread E-commerce Backend</a> &gt; <a href="index.source.html" class="el_package">com.crestandthread.ecommerce.controller</a> &gt; <span class="el_source">ProductController.java</span></div><h1>ProductController.java</h1><pre class="source lang-java linenums">// AI Generated Code by Deloitte + Cursor (BEGIN)
+package com.crestandthread.ecommerce.controller;
+
+import com.crestandthread.ecommerce.dto.ProductDTO;
+import com.crestandthread.ecommerce.dto.ProductListResponse;
+import com.crestandthread.ecommerce.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/products&quot;)
+@RequiredArgsConstructor
+<span class="fc" id="L18">@Slf4j</span>
+@CrossOrigin(origins = &quot;http://localhost:3000&quot;)
+public class ProductController {
+
+    private final ProductService productService;
+
+    @GetMapping(&quot;/featured&quot;)
+    public ResponseEntity&lt;List&lt;ProductDTO&gt;&gt; getFeaturedProducts() {
+<span class="fc" id="L26">        log.info(&quot;GET /products/featured - Fetching featured products&quot;);</span>
+<span class="fc" id="L27">        List&lt;ProductDTO&gt; products = productService.getFeaturedProducts();</span>
+<span class="fc" id="L28">        return ResponseEntity.ok(products);</span>
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;ProductListResponse&gt; getProducts(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String color,
+            @RequestParam(required = false) String size,
+            @RequestParam(required = false) BigDecimal priceMin,
+            @RequestParam(required = false) BigDecimal priceMax,
+            @RequestParam(required = false, defaultValue = &quot;featured&quot;) String sort,
+            @RequestParam(defaultValue = &quot;1&quot;) int page,
+            @RequestParam(defaultValue = &quot;12&quot;) int limit
+    ) {
+<span class="fc" id="L43">        log.info(&quot;GET /products - Fetching products with filters&quot;);</span>
+<span class="fc" id="L44">        ProductListResponse response = productService.getProducts(</span>
+                category, type, color, size, priceMin, priceMax, sort, page, limit
+        );
+<span class="fc" id="L47">        return ResponseEntity.ok(response);</span>
+    }
+}
+// AI Generated Code by Deloitte + Cursor (END)
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
