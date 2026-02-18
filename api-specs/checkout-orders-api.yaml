@@ -1,0 +1,422 @@
+openapi: 3.0.3
+info:
+  title: Crest & Thread Checkout & Orders API
+  description: API for checkout process and order management
+  version: 1.0.0
+  contact:
+    name: Commerce4Retail Team
+    email: api@crestthread.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development
+  - url: https://api.crestthread.com
+    description: Production
+
+paths:
+  /checkout:
+    post:
+      summary: Create checkout session
+      operationId: createCheckout
+      tags:
+        - Checkout
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - shippingAddress
+                - billingAddress
+                - paymentMethod
+              properties:
+                shippingAddress:
+                  $ref: '#/components/schemas/Address'
+                billingAddress:
+                  $ref: '#/components/schemas/Address'
+                paymentMethod:
+                  $ref: '#/components/schemas/PaymentMethod'
+                promoCode:
+                  type: string
+      responses:
+        '201':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutSession'
+        '400':
+          description: Invalid checkout data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders:
+    get:
+      summary: Get user's order history
+      operationId: getOrders
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, processing, shipped, delivered, cancelled]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Orders retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  totalPages:
+                    type: integer
+
+    post:
+      summary: Place an order
+      operationId: createOrder
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - checkoutSessionId
+              properties:
+                checkoutSessionId:
+                  type: string
+      responses:
+        '201':
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid order data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{orderId}:
+    get:
+      summary: Get order details
+      operationId: getOrderById
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{orderId}/track:
+    get:
+      summary: Track order shipment
+      operationId: trackOrder
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tracking information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackingInfo'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Address:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - addressLine1
+        - city
+        - state
+        - postalCode
+        - country
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        addressLine1:
+          type: string
+          example: "123 Main Street"
+        addressLine2:
+          type: string
+          example: "Apt 4B"
+        city:
+          type: string
+          example: "New York"
+        state:
+          type: string
+          example: "NY"
+        postalCode:
+          type: string
+          example: "10001"
+        country:
+          type: string
+          example: "USA"
+        phone:
+          type: string
+          example: "+1-555-123-4567"
+
+    PaymentMethod:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: [credit_card, debit_card, paypal, apple_pay]
+        cardToken:
+          type: string
+          description: Tokenized card information
+          example: "tok_1234567890abcdef"
+
+    CheckoutSession:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "checkout-001"
+        cartSummary:
+          type: object
+          properties:
+            subtotal:
+              type: number
+              format: decimal
+            tax:
+              type: number
+              format: decimal
+            shipping:
+              type: number
+              format: decimal
+            total:
+              type: number
+              format: decimal
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        paymentMethod:
+          type: string
+        estimatedDelivery:
+          type: string
+          format: date
+          example: "2026-02-25"
+        expiresAt:
+          type: string
+          format: date-time
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "order-001"
+        orderNumber:
+          type: string
+          example: "ORD-2026-00123"
+        userId:
+          type: string
+          example: "user-123"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        subtotal:
+          type: number
+          format: decimal
+          example: 570.00
+        tax:
+          type: number
+          format: decimal
+          example: 51.30
+        shipping:
+          type: number
+          format: decimal
+          example: 15.00
+        discount:
+          type: number
+          format: decimal
+          example: 0.00
+        total:
+          type: number
+          format: decimal
+          example: 636.30
+        status:
+          type: string
+          enum: [pending, processing, shipped, delivered, cancelled]
+          example: "processing"
+        paymentStatus:
+          type: string
+          enum: [pending, authorized, captured, failed, refunded]
+          example: "captured"
+        trackingNumber:
+          type: string
+          example: "1Z999AA10123456784"
+        estimatedDelivery:
+          type: string
+          format: date
+          example: "2026-02-25"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    OrderItem:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: "prod-001"
+        title:
+          type: string
+          example: "Classic Tailored Blazer"
+        image:
+          type: string
+          example: "/images/products/blazer.jpg"
+        price:
+          type: number
+          format: decimal
+          example: 285.00
+        quantity:
+          type: integer
+          example: 2
+        size:
+          type: string
+          example: "M"
+        color:
+          type: string
+          example: "navy"
+        subtotal:
+          type: number
+          format: decimal
+          example: 570.00
+
+    TrackingInfo:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: "order-001"
+        trackingNumber:
+          type: string
+          example: "1Z999AA10123456784"
+        carrier:
+          type: string
+          example: "FedEx"
+        status:
+          type: string
+          example: "In Transit"
+        estimatedDelivery:
+          type: string
+          format: date
+          example: "2026-02-25"
+        events:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+              status:
+                type: string
+                example: "Package picked up"
+              location:
+                type: string
+                example: "New York, NY"
+              description:
+                type: string
+                example: "Package picked up by carrier"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
