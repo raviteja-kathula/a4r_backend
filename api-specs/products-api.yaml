@@ -1,0 +1,258 @@
+openapi: 3.0.3
+info:
+  title: Crest & Thread Products API
+  description: API for managing and retrieving apparel products
+  version: 1.0.0
+  contact:
+    name: Commerce4Retail Team
+    email: api@crestthread.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development
+  - url: https://api.crestthread.com
+    description: Production
+
+paths:
+  /products:
+    get:
+      summary: Get all products with filtering
+      operationId: getProducts
+      tags:
+        - Products
+      parameters:
+        - name: category
+          in: query
+          description: Filter by category
+          schema:
+            type: string
+            enum: [women, men, accessories]
+        - name: type
+          in: query
+          description: Filter by product type
+          schema:
+            type: string
+            enum: [outerwear, tops, bags, dresses, bottoms, scarves]
+        - name: color
+          in: query
+          description: Filter by color
+          schema:
+            type: string
+            enum: [beige, black, blue, charcoal, cream, emerald, grey, indigo, navy, tan, white]
+        - name: size
+          in: query
+          description: Filter by size
+          schema:
+            type: string
+            enum: [xs, s, m, l, xl, xxl, onesize, "30", "32", "34", "36"]
+        - name: priceMin
+          in: query
+          description: Minimum price
+          schema:
+            type: number
+            minimum: 0
+        - name: priceMax
+          in: query
+          description: Maximum price
+          schema:
+            type: number
+            minimum: 0
+        - name: sort
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [featured, price_asc, price_desc, newest, rating]
+            default: featured
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 12
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '400':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{productId}:
+    get:
+      summary: Get product by ID
+      operationId: getProductById
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/featured:
+    get:
+      summary: Get featured products
+      operationId: getFeaturedProducts
+      tags:
+        - Products
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 6
+      responses:
+        '200':
+          description: Featured products retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  total:
+                    type: integer
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - title
+        - category
+        - price
+        - image
+      properties:
+        id:
+          type: string
+          example: "prod-001"
+        title:
+          type: string
+          example: "Classic Tailored Blazer"
+        description:
+          type: string
+          example: "A timeless blazer crafted from premium wool"
+        category:
+          type: string
+          enum: [WOMEN, MEN, ACCESSORIES]
+        type:
+          type: string
+          enum: [outerwear, tops, bags, dresses, bottoms, scarves]
+        price:
+          type: number
+          format: decimal
+          example: 285.00
+        salePrice:
+          type: number
+          format: decimal
+          nullable: true
+        rating:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+          example: 4.8
+        reviewCount:
+          type: integer
+          example: 127
+        image:
+          type: string
+          example: "/images/products/blazer.jpg"
+        images:
+          type: array
+          items:
+            type: string
+        badge:
+          type: string
+          enum: [NEW, BESTSELLER, SALE]
+          nullable: true
+        colors:
+          type: array
+          items:
+            type: string
+        sizes:
+          type: array
+          items:
+            type: string
+        inStock:
+          type: boolean
+          default: true
+        stockQuantity:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ProductListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        total:
+          type: integer
+          description: Total number of products matching filters
+        page:
+          type: integer
+          description: Current page number
+        totalPages:
+          type: integer
+          description: Total number of pages
+        hasNext:
+          type: boolean
+          description: Whether there are more pages
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
