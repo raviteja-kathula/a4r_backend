@@ -1,0 +1,244 @@
+openapi: 3.0.3
+info:
+  title: Crest & Thread Shopping Cart API
+  description: API for managing shopping cart operations
+  version: 1.0.0
+  contact:
+    name: Commerce4Retail Team
+    email: api@crestthread.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development
+  - url: https://api.crestthread.com
+    description: Production
+
+paths:
+  /cart:
+    get:
+      summary: Get user's shopping cart
+      operationId: getCart
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cart retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/items:
+    post:
+      summary: Add item to cart
+      operationId: addCartItem
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - productId
+                - quantity
+                - size
+              properties:
+                productId:
+                  type: string
+                  example: "prod-001"
+                quantity:
+                  type: integer
+                  minimum: 1
+                  example: 2
+                size:
+                  type: string
+                  example: "M"
+                color:
+                  type: string
+                  example: "navy"
+      responses:
+        '201':
+          description: Item added to cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/items/{itemId}:
+    put:
+      summary: Update cart item quantity
+      operationId: updateCartItem
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - quantity
+              properties:
+                quantity:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: Cart item updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: Cart item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Remove item from cart
+      operationId: removeCartItem
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Item removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: Cart item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "cart-001"
+        userId:
+          type: string
+          example: "user-123"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+        subtotal:
+          type: number
+          format: decimal
+          example: 570.00
+        tax:
+          type: number
+          format: decimal
+          example: 51.30
+        shipping:
+          type: number
+          format: decimal
+          example: 15.00
+        total:
+          type: number
+          format: decimal
+          example: 636.30
+        itemCount:
+          type: integer
+          example: 2
+
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "item-001"
+        productId:
+          type: string
+          example: "prod-001"
+        title:
+          type: string
+          example: "Classic Tailored Blazer"
+        image:
+          type: string
+          example: "/images/products/blazer.jpg"
+        price:
+          type: number
+          format: decimal
+          example: 285.00
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
+        size:
+          type: string
+          example: "M"
+        color:
+          type: string
+          example: "navy"
+        subtotal:
+          type: number
+          format: decimal
+          example: 570.00
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
